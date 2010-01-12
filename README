@@ -1,0 +1,26 @@
+Template
+========
+
+A templating system that takes into account that PHP is already a templating language.
+
+
+Features
+--------
+
+ * inheritance
+ * inclusion
+ * block
+ * caching (via APC or apc_alt)
+ * HTTP headers
+
+
+Licence
+-------
+
+BSD
+
+
+Author
+------
+
+Yoan Blanc, doSimple
