@@ -33,11 +33,11 @@ class Template {
     private $inherits = array();
     private $blocks = array();
     private $blocknames = array();
-    //private $caches = array();
+    private $caches = array();
     private $args = array();
     public $globals = array();
 
-    function __construct($base, $globals=null, $ext=".tpl.php") {
+    function __construct($base, $globals = null, $ext = ".tpl.php") {
         $this->paths[] = $base."/";
         $this->ext = $ext;
 
@@ -73,18 +73,21 @@ class Template {
             switch($this->blocks[$blockname]["mode"]) {
                 case "before":
                 case "prepend":
-                    $this->blocks[$blockname] = array("content" => $this->blocks[$blockname]["content"].ob_get_contents(),
-                                                      "mode" => $mode);
+                    $this->blocks[$blockname] = array(
+                        "content" => $this->blocks[$blockname]["content"] . ob_get_contents(),
+                        "mode" => $mode
+                    );
                     break;
                 case "after":
                 case "append":
-                    $this->blocks[$blockname] = array("content" => ob_get_contents().$this->blocks[$blockname]["content"],
-                                                      "mode" => $mode);
-                                                     
+                    $this->blocks[$blockname] = array(
+                        "content" => ob_get_contents() . $this->blocks[$blockname]["content"],
+                        "mode" => $mode
+                    );                                 
                     break;
             }
         }
-        
+
         ob_end_clean();
 
         if($mode === "replace") {
@@ -111,9 +114,9 @@ class Template {
 
     function endcache() {
         $data = ob_get_contents();
-        
+
         ob_end_clean();
-        
+
         list($key, $ttl) = array_pop($this->caches);
         apc_store($key, $data, $ttl);
         echo $data;
@@ -121,10 +124,10 @@ class Template {
 
     function __call($name, $arguments) {
         // take current context
-        $base = $this->paths[count($this->paths)-1];
+        $base = $this->paths[count($this->paths) - 1];
         $path = dirname($name);
         if($path !== ".") {
-            $base .= $path."/";
+            $base .= $path . "/";
             $name = basename($name);
         }
         // push current context
@@ -138,7 +141,7 @@ class Template {
             }
 
             $args = array_merge((array)$this->globals, $arguments[0]);
-            
+
             $this->file = $file;
             $this->inherits[$file] = array();
             // used by the placeholder
@@ -152,18 +155,19 @@ class Template {
             $args = array_shift($this->args);
             $content = ob_get_contents();
             ob_end_clean();
-            
+
             while($inherit = array_pop($this->inherits[$file])) {
                 $content = $this->{$inherit}($args);
             }
 
             // pop the context
             array_pop($this->paths);
-            
+
             return $content;
         } else {
-            throw new Exception("File not found (".$file.")");
+            throw new Exception("File not found ($file)");
         }
     }
 }
 
+?>
